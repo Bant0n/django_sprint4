@@ -180,7 +180,8 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse_lazy("blog:post_detail", kwargs={"pk": self.post_obj.pk})
+        return reverse_lazy("blog:post_detail",
+                            kwargs={"pk": self.post_obj.pk})
 
 
 class PostDeleteView(LoginRequiredMixin, DeleteView):
