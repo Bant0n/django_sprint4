@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Count, Prefetch
+from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -21,26 +21,44 @@ class IndexView(ListView):
     model = Post
     template_name = "blog/index.html"
     paginate_by = POSTS_PER_PAGE
-    ordering = "-pub_date"
 
     def get_queryset(self):
-        queryset = (
-            Post.objects.prefetch_related("comments")
-            .select_related(
+        return Post.objects.prefetch_related("comments").select_related(
                 "author",
                 "category",
                 "location",
-            )
-            .filter(
+            ).filter(
                 pub_date__lt=timezone.now(),
                 is_published=True,
                 category__is_published=True,
-            )
-            .annotate(comment_count=Count("comments"))
+            ).annotate(comment_count=Count("comments")).order_by('-pub_date')
+
+
+class Profile(ListView):
+    model = Post
+    template_name = 'blog/profile.html'
+    ordering = 'id'
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['profile'] = get_object_or_404(User, username=self.kwargs.get(
+            'username'
         )
-        return queryset
+        )
+        return context
+
+    def get_queryset(self):
+        author = get_object_or_404(User, username=self.kwargs.get('username'))
+        instance = author.posts.filter(
+            author__username__exact=self.kwargs.get('username')
+        ).annotate(
+            comment_count=Count('comments')
+        ).order_by('-pub_date')
+        return instance
 
 
+'''
 class Profile(ListView):
     model = Post
     template_name = "blog/profile.html"
@@ -83,6 +101,7 @@ class Profile(ListView):
             .order_by("-pub_date")
         )
         return posts
+'''
 
 
 class CategoryListView(ListView):
