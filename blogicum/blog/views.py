@@ -69,7 +69,7 @@ class Profile(ListView):
                         category__is_published=True,
                     )
                     .annotate(comment_count=Count("comments"))
-                    )
+                )
             )
         )
         self.profile = get_object_or_404(
