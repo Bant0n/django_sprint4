@@ -24,14 +24,14 @@ class IndexView(ListView):
 
     def get_queryset(self):
         return Post.objects.prefetch_related("comments").select_related(
-                "author",
-                "category",
-                "location",
-            ).filter(
-                pub_date__lt=timezone.now(),
-                is_published=True,
-                category__is_published=True,
-            ).annotate(comment_count=Count("comments")).order_by('-pub_date')
+            "author",
+            "category",
+            "location",
+        ).filter(
+            pub_date__lt=timezone.now(),
+            is_published=True,
+            category__is_published=True,
+        ).annotate(comment_count=Count("comments")).order_by('-pub_date')
 
 
 class Profile(ListView):
