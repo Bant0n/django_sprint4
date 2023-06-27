@@ -38,6 +38,7 @@ class Post(BaseModel):
         on_delete=models.SET_NULL,
         null=True,
         verbose_name="Местоположение",
+        blank=True
     )
     category = models.ForeignKey(
         "Category",
@@ -78,6 +79,9 @@ class Category(BaseModel):
     class Meta:
         verbose_name = "категория"
         verbose_name_plural = "Категории"
+
+    def get_absolute_url(self):
+        return reverse("category", kwargs={"category_slug": self.slug})
 
     def __str__(self) -> str:
         return self.title
