@@ -24,8 +24,7 @@ class IndexView(ListView):
 
     def get_queryset(self):
         return (
-            Post.objects
-            .select_related(
+            Post.objects.select_related(
                 "author",
                 "category",
                 "location",
@@ -56,7 +55,7 @@ class ProfileListView(ListView):
     def get_queryset(self):
         post_list = User.objects.prefetch_related(
             Prefetch(
-                'posts',
+                "posts",
                 queryset=(
                     Post.objects.select_related(
                         "author",
@@ -64,12 +63,12 @@ class ProfileListView(ListView):
                         "location",
                     )
                     .filter(
-                        Q(author__username=self.kwargs['username']) |
-                        Q(pub_date__lte=timezone.now(), is_published=True)
+                        Q(author__username=self.kwargs["username"])
+                        | Q(pub_date__lte=timezone.now(), is_published=True)
                     )
                     .annotate(comment_count=Count("comments"))
                     .order_by("-pub_date")
-                )
+                ),
             )
         )
         self.profile = get_object_or_404(
@@ -98,14 +97,15 @@ class CategoryListView(ListView):
             Category, slug=category_slug, is_published=True
         )
 
-        return category.posts.select_related(
-                "category",
-                "author",
-                "location"
-            ).filter(
+        return (
+            category.posts.select_related("category", "author", "location")
+            .filter(
                 pub_date__lt=timezone.now(),
                 is_published=True,
-            ).annotate(comment_count=Count("comments")).order_by("-pub_date")
+            )
+            .annotate(comment_count=Count("comments"))
+            .order_by("-pub_date")
+        )
 
 
 class PostDetailView(DetailView):
