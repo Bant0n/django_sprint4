@@ -7,7 +7,8 @@ app_name = 'blog'
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
 
-    path('profile/<slug:username>/', views.Profile.as_view(), name='profile'),
+    path('profile/<slug:username>/',
+         views.ProfileListView.as_view(), name='profile'),
 
     path('edit_profile/', views.ProfileEdit.as_view(), name='edit_profile'),
 
