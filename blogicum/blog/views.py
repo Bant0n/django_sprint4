@@ -40,7 +40,6 @@ class IndexView(ListView):
 
 
 class ProfileListView(ListView):
-    model = User
     template_name = "blog/profile.html"
     paginate_by = POSTS_PER_PAGE
 
