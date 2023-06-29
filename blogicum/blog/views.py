@@ -63,7 +63,8 @@ class ProfileListView(ListView):
                     )
                     .filter(
                         Q(author__username=self.kwargs["username"])
-                        | Q(pub_date__lte=timezone.now(), is_published=True)
+                        | Q(pub_date__lte=timezone.now(), is_published=True,
+                            category__is_published=True)
                     )
                     .annotate(comment_count=Count("comments"))
                     .order_by("-pub_date")
@@ -127,10 +128,6 @@ class ProfileEdit(LoginRequiredMixin, UpdateView):
     def get_object(self, queryset=None):
         return self.request.user
 
-    def form_valid(self, form):
-        form.instance.author = self.request.user
-        return super().form_valid(form)
-
     def get_success_url(self):
         return reverse(
             "blog:profile", kwargs={"username": self.request.user.username}
@@ -158,10 +155,6 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "blog/create.html"
     pk_url_kwarg = "pk"
     post_obj = None
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
 
     def dispatch(self, request, *args, **kwargs):
         self.post_obj = get_object_or_404(Post, pk=kwargs.get("pk"))
